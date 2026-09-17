@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Scientific Calculator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f3eeee;
+    font-family: Arial, sans-serif;
+}
+
+.calculator {
+    width: 370px;
+    padding: 20px;
+    border-radius: 20px;
+    background: #eee7e7;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.display {
+    width: 100%;
+    height: 75px;
+    padding: 15px;
+    margin-bottom: 12px;
+
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+
+    font-size: 28px;
+    text-align: right;
+
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.mode {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #ddd;
+    cursor: pointer;
+
+    font-size: 16px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+button {
+    height: 55px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f8f3f3;
+
+    font-size: 17px;
+    cursor: pointer;
+
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+button:hover {
+    background: #ddd;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.operator {
+    background: #e3dddd;
+}
+
+.clear {
+    background: #ddd;
+}
+
+.equals {
+    background: #333;
+    color: white;
+}
+
+.wide {
+    grid-column: span 2;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div id="display" class="display">0</div>
+
+    <button class="mode" id="modeButton" onclick="toggleMode()">
+        RAD
+    </button>
+
+    <div class="buttons">
+
+        <!-- Row 1 -->
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button class="operator" onclick="append('/')">÷</button>
+        <button onclick="append('(')">(</button>
+        <button onclick="append(')')">)</button>
+
+        <!-- Row 2 -->
+        <button onclick="append('sin(')">sin</button>
+        <button onclick="append('cos(')">cos</button>
+        <button onclick="append('tan(')">tan</button>
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+
+        <!-- Row 3 -->
+        <button onclick="append('log(')">log</button>
+        <button onclick="append('ln(')">ln</button>
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="operator" onclick="append('*')">×</button>
+
+        <!-- Row 4 -->
+        <button onclick="append('e')">e</button>
+        <button onclick="append('^')">^</button>
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="backspace()">⌫</button>
+
+        <!-- Row 5 -->
+        <button onclick="append('pi')">π</button>
+        <button class="operator" onclick="append('-')">−</button>
+        <button class="operator" onclick="append('+')">+</button>
+        <button class="equals wide" onclick="calculate()">=</button>
+
+    </div>
+</div>
+
+<script>
+
+let mode = "RAD";
+
+const display = document.getElementById("display");
+const modeButton = document.getElementById("modeButton");
+
+
+/* =========================
+   DISPLAY
+========================= */
+
+function append(value) {
+
+    if (
+        display.innerText === "0" ||
+        display.innerText === "Error"
+    ) {
+        display.innerText = "";
+    }
+
+    display.innerText += value;
+}
+
+
+function clearDisplay() {
+    display.innerText = "0";
+}
+
+
+function backspace() {
+
+    if (
+        display.innerText === "Error" ||
+        display.innerText.length <= 1
+    ) {
+        display.innerText = "0";
+        return;
+    }
+
+    display.innerText =
+        display.innerText.slice(0, -1);
+}
+
+
+/* =========================
+   RAD / DEG MODE
+========================= */
+
+function toggleMode() {
+
+    if (mode === "RAD") {
+        mode = "DEG";
+    } else {
+        mode = "RAD";
+    }
+
+    modeButton.innerText = mode;
+}
+
+
+/* =========================
+   TRIG FUNCTIONS
+========================= */
+
+function sin(x) {
+
+    if (mode === "DEG") {
+        return Math.sin(x * Math.PI / 180);
+    }
+
+    return Math.sin(x);
+}
+
+
+function cos(x) {
+
+    if (mode === "DEG") {
+        return Math.cos(x * Math.PI / 180);
+    }
+
+    return Math.cos(x);
+}
+
+
+function tan(x) {
+
+    if (mode === "DEG") {
+        return Math.tan(x * Math.PI / 180);
+    }
+
+    return Math.tan(x);
+}
+
+
+/* =========================
+   LOG FUNCTIONS
+========================= */
+
+function log(x) {
+    return Math.log10(x);
+}
+
+
+function ln(x) {
+    return Math.log(x);
+}
+
+
+/* =========================
+   CALCULATE
+========================= */
+
+function calculate() {
+
+    try {
+
+        let expression = display.innerText;
+
+        /*
+         * Replace calculator symbols
+         */
+
+        expression = expression
+            .replace(/π/g, "pi")
+            .replace(/×/g, "*")
+            .replace(/÷/g, "/")
+            .replace(/\^/g, "**");
+
+
+        /*
+         * Convert constants
+         */
+
+        expression = expression.replace(
+            /\bpi\b/g,
+            "Math.PI"
+        );
+
+        expression = expression.replace(
+            /\be\b/g,
+            "Math.E"
+        );
+
+
+        /*
+         * Evaluate expression
+         *
+         * IMPORTANT:
+         * sin(), cos(), tan() now use RAD mode
+         * by default.
+         */
+
+        const result = new Function(
+            "sin",
+            "cos",
+            "tan",
+            "log",
+            "ln",
+            `
+            "use strict";
+            return (${expression});
+            `
+        )(
+            sin,
+            cos,
+            tan,
+            log,
+            ln
+        );
+
+
+        /*
+         * Invalid result
+         */
+
+        if (!Number.isFinite(result)) {
+            throw new Error("Invalid result");
+        }
+
+
+        /*
+         * Fix floating-point errors.
+         *
+         * Math.sin(Math.PI) gives:
+         * 1.2246467991473532e-16
+         *
+         * Mathematically this is 0.
+         */
+
+        let finalResult = result;
+
+        if (Math.abs(finalResult) < 1e-12) {
+            finalResult = 0;
+        }
+
+
+        /*
+         * Remove unnecessary decimals
+         */
+
+        if (Number.isInteger(finalResult)) {
+
+            display.innerText =
+                finalResult.toString();
+
+        } else {
+
+            display.innerText =
+                Number(finalResult.toFixed(12)).toString();
+
+        }
+
+    } catch (error) {
+
+        display.innerText = "Error";
+
+        console.log(error);
+    }
+}
+
+
+/* =========================
+   KEYBOARD SUPPORT
+========================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        const key = event.key;
+
+        if ("0123456789.+-*/()".includes(key)) {
+            append(key);
+        }
+
+        else if (key === "Enter") {
+            calculate();
+        }
+
+        else if (key === "Backspace") {
+            backspace();
+        }
+
+        else if (key === "Escape") {
+            clearDisplay();
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
